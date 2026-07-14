@@ -2,6 +2,8 @@
 
 Visualize Sentinel-2 cloud-free median composite imagery for Thailand on an interactive web map powered by **Google Earth Engine** and **Leaflet.js**.
 
+🔗 **[View on GitHub](https://github.com/prametkae-blip/GEE_THA)** | 📍 **[Live Demo](https://prametkae-blip.github.io/GEE_THA/Sentinel2.html)** (coming soon with GitHub Pages)
+
 ## Features
 
 - 🛰️ **Sentinel-2 Imagery**: Surface Reflectance, cloud-masked (QA60), median composite
@@ -17,6 +19,17 @@ Visualize Sentinel-2 cloud-free median composite imagery for Thailand on an inte
 ---
 
 ## Quick Start (3 Steps)
+
+### Clone from GitHub (Optional)
+
+```bash
+git clone https://github.com/prametkae-blip/GEE_THA.git
+cd GEE_THA
+```
+
+Or just download `Sentinel2.html` directly from the repo!
+
+---
 
 ### Step 1: Generate Sentinel-2 Tile URL
 
@@ -229,6 +242,26 @@ Pramet (Geo_AI • GEE_THA)
 
 ---
 
+## GitHub Repository
+
+📍 **[prametkae-blip/GEE_THA](https://github.com/prametkae-blip/GEE_THA)**
+
+All source files are hosted on GitHub. Feel free to:
+- ⭐ Star the repo if you find it useful!
+- 🍴 Fork it for your own modifications
+- 📝 Submit issues or pull requests
+- 📦 Use it as a template for other regions
+
+### Clone & Use
+
+```bash
+git clone https://github.com/prametkae-blip/GEE_THA.git
+cd GEE_THA
+# Then open Sentinel2.html in a browser
+```
+
+---
+
 ## Version History
 
 - **v1.0** — Initial release (2026-07-14)
@@ -236,3 +269,4 @@ Pramet (Geo_AI • GEE_THA)
   - Leaflet viewer with Google Satellite basemap
   - GEE Code Editor script included
   - Thailand boundary layer
+  - Published on GitHub
