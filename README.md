@@ -2,7 +2,15 @@
 
 Visualize Sentinel-2 cloud-free median composite imagery for Thailand on an interactive web map powered by **Google Earth Engine** and **Leaflet.js**.
 
-🔗 **[View on GitHub](https://github.com/prametkae-blip/GEE_THA)** | 📍 **[Live Demo](https://prametkae-blip.github.io/GEE_THA/Sentinel2.html)** (coming soon with GitHub Pages)
+🔗 **[View on GitHub](https://github.com/prametkae-blip/GEE_THA)** | 🌍 **[Live Demo](https://prametkae-blip.github.io/GEE_THA/Sentinel2.html)** ✅
+
+## 🚀 Quick Links
+
+**[🌍 OPEN LIVE MAP NOW!](https://prametkae-blip.github.io/GEE_THA/Sentinel2.html)** ← Click here to view the map!
+
+(Hosted on GitHub Pages • No installation needed • 100% free)
+
+---
 
 ## Features
 
