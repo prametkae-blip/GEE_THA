@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sentinel-2 Cloud-Free Median Composite - Thailand 2026</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.11.0/proj4.min.js"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      background: rgba(255,255,255,0.95);
+      padding: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .header h1 {
+      color: #333;
+      margin-bottom: 5px;
+      font-size: 28px;
+    }
+
+    .header p {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #4ecdc4;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+
+    .container {
+      display: flex;
+      flex: 1;
+      max-width: 1400px;
+      margin: 20px auto;
+      width: 100%;
+      gap: 20px;
+      padding: 0 20px;
+    }
+
+    #map {
+      flex: 1;
+      min-height: 600px;
+      border-radius: 10px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      background: #f0f0f0;
+    }
+
+    .sidebar {
+      width: 320px;
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      overflow-y: auto;
+      max-height: calc(100vh - 200px);
+    }
+
+    .sidebar h2 {
+      color: #333;
+      margin-bottom: 15px;
+      font-size: 18px;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+    }
+
+    .stats {
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .stat-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .stat-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .stat-label {
+      color: #666;
+    }
+
+    .stat-value {
+      font-weight: bold;
+      color: #667eea;
+    }
+
+    .info-group {
+      margin-bottom: 15px;
+    }
+
+    .info-label {
+      font-weight: bold;
+      color: #667eea;
+      font-size: 12px;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    .info-value {
+      color: #333;
+      font-size: 14px;
+      word-break: break-word;
+      font-family: 'Courier New', monospace;
+    }
+
+    .slider-container {
+      margin-bottom: 15px;
+    }
+
+    .slider-label {
+      font-weight: bold;
+      color: #667eea;
+      font-size: 12px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: #ddd;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #667eea;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #667eea;
+      cursor: pointer;
+      border: none;
+    }
+
+    .warning {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #856404;
+    }
+
+    .footer {
+      background: rgba(255,255,255,0.95);
+      padding: 15px 20px;
+      text-align: center;
+      color: #666;
+      font-size: 12px;
+      margin-top: auto;
+    }
+
+    .footer a {
+      color: #667eea;
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+    }
+
+    @media (max-width: 768px) {
+      .container { flex-direction: column; }
+      .sidebar { width: 100%; max-height: 300px; }
+      #map { min-height: 400px; }
+      .header h1 { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Sentinel-2 Cloud-Free Median Composite <span class="badge">2026</span></h1>
+    <p>Thailand • January 1 – Today • Powered by Google Earth Engine & Leaflet</p>
+  </div>
+
+  <div class="container">
+    <div id="map"></div>
+    <div class="sidebar">
+      <h2>Composite Info</h2>
+
+      <div class="warning">
+        ⚠️ <strong>First time?</strong> Run <code>gee/sentinel2_thailand_2026.js</code> in your GEE account first and paste the tile URL below.
+      </div>
+
+      <div class="info-group">
+        <label class="info-label">Sentinel-2 Tile URL</label>
+        <div class="info-value" id="tileStatus">No URL loaded (placeholder)</div>
+      </div>
+
+      <div class="slider-container">
+        <label class="slider-label" for="opacitySlider">S2 Layer Opacity</label>
+        <input type="range" id="opacitySlider" min="0" max="100" value="90" />
+        <div style="font-size: 12px; color: #666; margin-top: 5px;">
+          <span id="opacityValue">90</span>%
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat-item">
+          <span class="stat-label">Collection:</span>
+          <span class="stat-value">COPERNICUS/S2_SR</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Date Range:</span>
+          <span class="stat-value">2026-01-01 → Today</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Cloud Mask:</span>
+          <span class="stat-value">QA60 (bits 10-11)</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Reducer:</span>
+          <span class="stat-value">Median</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Bands:</span>
+          <span class="stat-value">B4 | B3 | B2 (TrueColor)</span>
+        </div>
+      </div>
+
+      <div class="info-group">
+        <div class="info-label">Region</div>
+        <div class="info-value">Thailand (FAO/GAUL 2015)</div>
+      </div>
+
+      <div class="info-group">
+        <div class="info-label">Processing</div>
+        <div class="info-value">Cloud-free composite • Surface Reflectance • Harmonized</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p><strong>GEE_THA</strong> — Sentinel-2 Cloud-Free Composites for Thailand |
+      Run <code>gee/sentinel2_thailand_2026.js</code> to update the tile URL |
+      <a href="https://code.earthengine.google.com" target="_blank">Google Earth Engine</a>
+    </p>
+  </div>
+
+  <script>
+    // ===== CONFIGURATION =====
+    // PASTE THE TILE URL HERE (from gee/sentinel2_thailand_2026.js console output)
+    const SENTINEL2_TILE_URL = 'https://earthengine.googleapis.com/v1/projects/ee-prametkae/maps/fc895afd1ec242fe95c17ffd62d3a5b2-2224898a1ae572d8476c8f037a06ca6a/tiles/{z}/{x}/{y}';
+    // ===== END CONFIGURATION =====
+
+    let map;
+    let s2Layer;
+    const sourceProj = '+proj=utm +zone=47 +datum=WGS84 +units=m +no_defs';
+    const targetProj = '+proj=longlat +datum=WGS84 +no_defs';
+
+    function initMap() {
+      // Initialize Leaflet map centered on Thailand
+      map = L.map('map').setView([15.87, 100.99], 5);
+
+      // Google Maps Satellite basemap (free XYZ, no API key needed)
+      const googleSatellite = L.tileLayer(
+        'https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+        {
+          maxZoom: 20,
+          minZoom: 2,
+          subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+          attribution: '© Google Maps Satellite'
+        }
+      ).addTo(map);
+
+      // Sentinel-2 overlay layer
+      s2Layer = L.tileLayer(SENTINEL2_TILE_URL, {
+        maxZoom: 14,
+        minZoom: 2,
+        opacity: 0.9,
+        attribution: '© Google Earth Engine • Sentinel-2 SR Harmonized'
+      }).addTo(map);
+
+      // Update tile URL status
+      document.getElementById('tileStatus').textContent =
+        SENTINEL2_TILE_URL.length > 50
+          ? SENTINEL2_TILE_URL.substring(0, 47) + '...'
+          : SENTINEL2_TILE_URL;
+
+      // Layer control for toggling
+      const layerControl = L.control.layers(
+        { 'Google Satellite': googleSatellite },
+        { 'Sentinel-2 Median (2026)': s2Layer },
+        { position: 'topright' }
+      ).addTo(map);
+
+      // Load and display Thailand boundary
+      loadThailandBoundary();
+
+      // Opacity slider
+      document.getElementById('opacitySlider').addEventListener('input', function (e) {
+        const opacity = e.target.value / 100;
+        s2Layer.setOpacity(opacity);
+        document.getElementById('opacityValue').textContent = e.target.value;
+      });
+    }
+
+    function reprojectGeoJSON(geojsonData) {
+      const projected = JSON.parse(JSON.stringify(geojsonData));
+
+      function transformCoords(coords) {
+        if (!Array.isArray(coords) || coords.length === 0) return coords;
+        if (typeof coords[0] === 'number') {
+          const [x, y] = coords;
+          const [lon, lat] = proj4(sourceProj, targetProj, [x, y]);
+          return [lon, lat];
+        }
+        return coords.map(transformCoords);
+      }
+
+      projected.features = (projected.features || []).map(feature => {
+        if (feature.geometry && feature.geometry.coordinates) {
+          return {
+            ...feature,
+            geometry: {
+              ...feature.geometry,
+              coordinates: transformCoords(feature.geometry.coordinates)
+            }
+          };
+        }
+        return feature;
+      });
+
+      return projected;
+    }
+
+    function loadThailandBoundary() {
+      fetch('./data/Thailand_Pramet.geojson')
+        .then(res => {
+          if (!res.ok) throw new Error('Failed to load Thailand boundary');
+          return res.json();
+        })
+        .then(data => {
+          const projected = reprojectGeoJSON(data);
+          displayThailandBoundary(projected);
+        })
+        .catch(err => {
+          console.error('Error loading boundary:', err);
+        });
+    }
+
+    function displayThailandBoundary(geojsonData) {
+      const boundaryStyle = {
+        color: '#FF6B6B',
+        weight: 2,
+        opacity: 0.8,
+        fillOpacity: 0, // No fill, just the outline
+        dashArray: '5, 5'
+      };
+
+      L.geoJSON(geojsonData, {
+        style: boundaryStyle,
+        onEachFeature: (feature, layer) => {
+          layer.bindPopup('<strong>Thailand</strong><br>Study Area Boundary');
+        }
+      }).addTo(map);
+    }
+
+    window.addEventListener('load', initMap);
+  </script>
+</body>
+</html>
