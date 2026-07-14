@@ -6,7 +6,11 @@ Visualize Sentinel-2 cloud-free median composite imagery for Thailand on an inte
 
 ## 🚀 Quick Links
 
-**[🌍 OPEN LIVE MAP NOW!](https://prametkae-blip.github.io/GEE_THA/Sentinel2.html)** ← Click here to view the map!
+### 🔴 This Project
+**[🌍 OPEN SENTINEL-2 MAP](https://prametkae-blip.github.io/GEE_THA/Sentinel2.html)** ← Cloud-free median composite
+
+### 🟢 Related Project
+**[🌱 OPEN MODIS ET/GPP MAP](https://prametkae-blip.github.io/GEE_ET/ET_GPP.html)** ← Evapotranspiration & Primary Productivity
 
 (Hosted on GitHub Pages • No installation needed • 100% free)
 
